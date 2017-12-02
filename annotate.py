@@ -16,7 +16,7 @@ def help():
         2.1 - 'g' for green
         2.2 - 'r' for red
         2.3 - 'y' for yellow
-        2.4 - 'n' for none
+        2.4 - 's' to skip image
     3) Press 'q' to quit before covering the whole dataset
     """
 
@@ -41,7 +41,7 @@ def mouse_callback(event, x, y, flags, param):
     elif event == cv2.EVENT_LBUTTONUP:
         xy_bottom_right = [x, y]
         print('Registered bottom-right corner: {}'.format(xy_bottom_right))
-        print('Press r for red, g for green or y for yellow')
+        print('Press r for red, g for green, y for yellow or s to skip')
 
 def annotate_bag(input_bag_path, output_folder):
     # Create bag object ang get number of messages
@@ -58,6 +58,7 @@ def annotate_bag(input_bag_path, output_folder):
 
     # Define output name
     input_name, _ = os.path.splitext(os.path.basename(input_bag_path))
+    output_folder = os.path.join(output_folder, input_name)
     output_name = os.path.join(output_folder, '{}_annotations.csv'.format(input_name))
 
     # Create output folder if it doesn't exist
@@ -72,7 +73,11 @@ def annotate_bag(input_bag_path, output_folder):
             print('Message {}/{}...'.format(msg_number, n_messages))
 
             # Convert from ROS to CV image
-            cv_image = cv_bridge.imgmsg_to_cv2(msg, "rgb8")
+            # Use BGR so that when calling cv.imwrite it will write the
+            # channels in the correct order. When training, the image
+            # will be read by PIL, which will read RGB, same as in the
+            # runtime code, where we get the OpenCV image as rgb8 encoded
+            cv_image = cv_bridge.imgmsg_to_cv2(msg, "bgr8")
 
             # Display image
             cv2.imshow('Image', cv_image)
@@ -86,7 +91,7 @@ def annotate_bag(input_bag_path, output_folder):
                 class_id = 2
             elif key == ord("y"):
                 class_id = 3
-            elif key == ord("n"):
+            elif key == ord("s"):
                 class_id = 0
             elif key == ord("q"):
                 break
