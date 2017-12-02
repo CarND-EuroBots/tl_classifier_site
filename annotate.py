@@ -83,32 +83,44 @@ def annotate_bag(input_bag_path, output_folder):
             cv2.imshow('Image', cv_image)
 
             # Wait for user to provide the annotation
-            key = cv2.waitKey(0) & 0xFF
+            is_valid_key = False
+            exit = False
+            while not is_valid_key:
+                key = cv2.waitKey(0) & 0xFF
 
-            if key == ord("r"):
-                class_id = 1
-            elif key == ord("g"):
-                class_id = 2
-            elif key == ord("y"):
-                class_id = 3
-            elif key == ord("s"):
-                class_id = 0
-            elif key == ord("q"):
+                is_valid_key = True
+                if key == ord("g"):
+                    class_id = 1
+                elif key == ord("y"):
+                    class_id = 2
+                elif key == ord("r"):
+                    class_id = 3
+                elif key == ord("s"):
+                    class_id = 0
+                elif key == ord("q"):
+                    exit = True
+                else:
+                    is_valid_key = False
+                    print('Invalid key {}, try again!'.format(chr(key)))
+
+            if exit:
                 break
 
             if class_id != 0:
                 # Save image to disk
                 img_fname = '{}_{}.jpg'.format(input_name, msg_number)
                 img_path = os.path.join(output_folder, img_fname)
-
                 cv2.imwrite(img_path, cv_image)
 
                 # Compute normalized coordinates of the bounding box
-                x1n = float(xy_top_left[0]) / float(cv_image.shape[1])
-                y1n = float(xy_top_left[1]) / float(cv_image.shape[0])
+                height = cv_image.shape[0]
+                width = cv_image.shape[1]
 
-                x2n = float(xy_bottom_right[0]) / float(cv_image.shape[1])
-                y2n = float(xy_bottom_right[1]) / float(cv_image.shape[0])
+                x1n = float(xy_top_left[0]) / float(width)
+                y1n = float(xy_top_left[1]) / float(height)
+
+                x2n = float(xy_bottom_right[0]) / float(width)
+                y2n = float(xy_bottom_right[1]) / float(height)
 
                 assert x1n >= 0.0 and x1n <= 1.0
                 assert y1n >= 0.0 and y1n <= 1.0
@@ -116,9 +128,10 @@ def annotate_bag(input_bag_path, output_folder):
                 assert y2n >= 0.0 and y2n <= 1.0
 
                 # Write to CSV file
-                output_file.write('{}, {}, {}, {}, {}\n'.format(img_path,
-                                                                x1n, y1n,
-                                                                x2n, y2n))
+                output_file.write('{}, {}, {}, {}, {}, {}\n'.format(img_path,
+                                                                    class_id,
+                                                                    x1n, y1n,
+                                                                    x2n, y2n))
             msg_number += 1
     # Stop application
     cv2.destroyAllWindows()
