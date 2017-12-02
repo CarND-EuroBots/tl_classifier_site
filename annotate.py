@@ -93,7 +93,7 @@ def annotate_bag(input_bag_path, output_folder):
 
             if class_id != 0:
                 # Save image to disk
-                img_fname = '{}_{}.png'.format(input_name, msg_number)
+                img_fname = '{}_{}.jpg'.format(input_name, msg_number)
                 img_path = os.path.join(output_folder, img_fname)
 
                 cv2.imwrite(img_path, cv_image)

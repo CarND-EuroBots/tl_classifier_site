@@ -1,0 +1,6 @@
+tensorflow-gpu==1.3.0
+pillow
+lxml
+jupyter
+matplotlib
+

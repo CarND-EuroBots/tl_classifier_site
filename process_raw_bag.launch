@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Use time from the rosbag -->
+    <param name="/use_sim_time" value="True" />
+
+    <!-- Rosbag recorder -->
+    <arg name="output_bag"/>
+    <node pkg="rosbag" type="record" name="logger" args="--all --output-name $(arg output_bag)"/>
+
+    <!-- Image processing -->
+    <node pkg="image_proc" type="image_proc" name="image_proc" />
+
+    <!-- Rosbag player -->
+    <!-- Replay at a lower rate so that the image_proc node has time to process -->
+    <arg name="input_bag"/>
+    <node pkg="rosbag" type="play" name="player" args="--queue=1000 --clock --delay=2 --rate=0.1 $(arg input_bag)"/>
+</launch>
