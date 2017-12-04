@@ -1,21 +1,21 @@
-FROM nvidia/cuda:8.0-cudnn6-devel
+FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
 
 # Install basic requirements
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \ 
+    apt-get install -y --no-install-recommends \
         git \
         wget \
-        python3-dev \
-        python3-pip \
-        python3-setuptools \
-        python3-tk \
+        python-dev \
+        python-pip \
+        python-setuptools \
+        python-tk \
         protobuf-compiler && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python requirements
 ADD requirements.txt /opt
-RUN pip3 install --upgrade pip && \
-    pip3 install --requirement /opt/requirements.txt && \
+RUN pip install --upgrade pip && \
+    pip install --requirement /opt/requirements.txt && \
     rm /opt/requirements.txt
 
 # Clone TensorFlow models repository
@@ -29,5 +29,4 @@ WORKDIR /opt/models/research
 RUN protoc object_detection/protos/*.proto --python_out=.
 
 # Export Python PATH
-ENV PYTHONPATH /opt/models/research:/opt/models/research/slim   
-
+ENV PYTHONPATH /opt/models/research:/opt/models/research/slim
