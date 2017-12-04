@@ -7,6 +7,7 @@
 """
 import io
 import os
+import random
 import tensorflow as tf
 import PIL.Image
 import numpy as np
@@ -16,10 +17,9 @@ from object_detection.utils import label_map_util
 
 flags = tf.app.flags
 flags.DEFINE_string('annotations_path', '', 'Path to input data')
-flags.DEFINE_string('output_path', '', 'Path to output TFRecord')
+flags.DEFINE_string('output_dir', '', 'Directory to store output TFRecords')
 flags.DEFINE_string('label_map_path', '', 'Path to label map proto')
 FLAGS = flags.FLAGS
-
 
 
 def create_tf_example(example, label_map_dict):
@@ -62,31 +62,51 @@ def create_tf_example(example, label_map_dict):
     }))
     return tf_example
 
-
-def main(_):
-    writer = tf.python_io.TFRecordWriter(FLAGS.output_path)
+def create_tf_record(examples, output_path):
+    writer = tf.python_io.TFRecordWriter(output_path)
 
     label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
 
-    # Read CSV
+    for example in examples:
+        tf_example = create_tf_example(example, label_map_dict)
+        writer.write(tf_example.SerializeToString())
+    writer.close()
+
+
+def main(_):
+    # Read CSV and store information into "examples"
+    examples = []
     annotations_file = FLAGS.annotations_path
 
     with open(annotations_file, 'r') as fid:
         for line in fid:
             csv_data = line.split(', ')
             example = {'filename': csv_data[0],
-                    'class_id': csv_data[1],
-                    'x1n': float(csv_data[2]),
-                    'y1n': float(csv_data[3]),
-                    'x2n': float(csv_data[4]),
-                    'y2n': float(csv_data[5])}
+                       'class_id': csv_data[1],
+                       'x1n': float(csv_data[2]),
+                       'y1n': float(csv_data[3]),
+                       'x2n': float(csv_data[4]),
+                       'y2n': float(csv_data[5])}
 
-            # Append example to TF record
-            tf_example = create_tf_example(example, label_map_dict)
-            writer.write(tf_example.SerializeToString())
+            examples.append(example)
 
-    writer.close()
+    # Shuffle
+    random.seed(42)
+    random.shuffle(examples)
 
+    # Split into training and validation sets
+    num_examples = len(examples)
+    num_train = int(0.7 * num_examples)
+
+    train_examples = examples[:num_train]
+    val_examples = examples[num_train:]
+
+    train_output_path = os.path.join(FLAGS.output_dir, 'train.record')
+    val_output_path = os.path.join(FLAGS.output_dir, 'val.record')
+
+    # Create TF records
+    create_tf_record(train_examples, train_output_path)
+    create_tf_record(val_examples, val_output_path)
 
 if __name__ == '__main__':
     tf.app.run()
