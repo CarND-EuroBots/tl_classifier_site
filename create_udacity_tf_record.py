@@ -8,18 +8,13 @@
 import io
 import os
 import random
-import tensorflow as tf
+import argparse
 import PIL.Image
+import tensorflow as tf
 import numpy as np
 
 from object_detection.utils import dataset_util
 from object_detection.utils import label_map_util
-
-flags = tf.app.flags
-flags.DEFINE_string('annotations_path', '', 'Path to input data')
-flags.DEFINE_string('output_dir', '', 'Directory to store output TFRecords')
-flags.DEFINE_string('label_map_path', '', 'Path to label map proto')
-FLAGS = flags.FLAGS
 
 
 def create_tf_example(example, label_map_dict):
@@ -62,33 +57,44 @@ def create_tf_example(example, label_map_dict):
     }))
     return tf_example
 
-def create_tf_record(examples, output_path):
+def create_tf_record(examples, output_path, label_map_dict):
     writer = tf.python_io.TFRecordWriter(output_path)
-
-    label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
 
     for example in examples:
         tf_example = create_tf_example(example, label_map_dict)
         writer.write(tf_example.SerializeToString())
+
     writer.close()
 
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Create TF record')
+
+    parser.add_argument('-i', dest='annotations_paths', nargs='*')
+    parser.add_argument('-o', dest='output_dir')
+    parser.add_argument('-l', dest='label_map_path')
+
+    return parser.parse_args()
+
 def main(_):
-    # Read CSV and store information into "examples"
     examples = []
-    annotations_file = FLAGS.annotations_path
 
-    with open(annotations_file, 'r') as fid:
-        for line in fid:
-            csv_data = line.split(', ')
-            example = {'filename': csv_data[0],
-                       'class_id': csv_data[1],
-                       'x1n': float(csv_data[2]),
-                       'y1n': float(csv_data[3]),
-                       'x2n': float(csv_data[4]),
-                       'y2n': float(csv_data[5])}
+    # Read CSV files and store information into "examples"
+    args = parse_arguments()
+    annotations_files = args.annotations_paths
 
-            examples.append(example)
+    for annotations_file in annotations_files:
+        with open(annotations_file, 'r') as fid:
+            for line in fid:
+                csv_data = line.split(', ')
+                example = {'filename': csv_data[0],
+                           'class_id': csv_data[1],
+                           'x1n': float(csv_data[2]),
+                           'y1n': float(csv_data[3]),
+                           'x2n': float(csv_data[4]),
+                           'y2n': float(csv_data[5])}
+
+                examples.append(example)
 
     # Shuffle
     random.seed(42)
@@ -101,12 +107,13 @@ def main(_):
     train_examples = examples[:num_train]
     val_examples = examples[num_train:]
 
-    train_output_path = os.path.join(FLAGS.output_dir, 'train.record')
-    val_output_path = os.path.join(FLAGS.output_dir, 'val.record')
+    train_output_path = os.path.join(args.output_dir, 'train.record')
+    val_output_path = os.path.join(args.output_dir, 'val.record')
 
     # Create TF records
-    create_tf_record(train_examples, train_output_path)
-    create_tf_record(val_examples, val_output_path)
+    label_map_dict = label_map_util.get_label_map_dict(args.label_map_path)
+    create_tf_record(train_examples, train_output_path, label_map_dict)
+    create_tf_record(val_examples, val_output_path, label_map_dict)
 
 if __name__ == '__main__':
     tf.app.run()
