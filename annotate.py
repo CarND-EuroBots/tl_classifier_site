@@ -90,13 +90,13 @@ def annotate_bag(input_bag_path, output_folder):
 
                 is_valid_key = True
                 if key == ord("g"):
-                    class_id = 1
+                    class_id = 'Green'
                 elif key == ord("y"):
-                    class_id = 2
+                    class_id = 'Yellow'
                 elif key == ord("r"):
-                    class_id = 3
+                    class_id = 'Red'
                 elif key == ord("s"):
-                    class_id = 0
+                    class_id = 'Unknown'
                 elif key == ord("q"):
                     exit = True
                 else:
@@ -106,7 +106,7 @@ def annotate_bag(input_bag_path, output_folder):
             if exit:
                 break
 
-            if class_id != 0:
+            if class_id != 'Unknown':
                 # Save image to disk
                 img_fname = '{}_{}.jpg'.format(input_name, msg_number)
                 img_path = os.path.join(output_folder, img_fname)
