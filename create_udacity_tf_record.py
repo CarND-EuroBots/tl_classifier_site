@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """Example usage:
     python create_udacity_tf_record.py \
         --annotations_path=/home/user/udacity/data/annotations.csv \
@@ -76,7 +76,7 @@ def parse_arguments():
 
     return parser.parse_args()
 
-def main(_):
+def main():
     examples = []
 
     # Read CSV files and store information into "examples"
@@ -116,4 +116,4 @@ def main(_):
     create_tf_record(val_examples, val_output_path, label_map_dict)
 
 if __name__ == '__main__':
-    tf.app.run()
+    main()

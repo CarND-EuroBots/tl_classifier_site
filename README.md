@@ -16,6 +16,11 @@ or 'Red', respectively. Press 's' to skip image or 'q' for quitting.
 
 ## Create TFrecord
 
+    $ docker run --rm=true -it -v=$(pwd):$(pwd) -w=$(pwd) -u=$(id -u):$(id -g) carlosgalvezp/tf-object-detection /bin/bash
+
+    $ ./create_udacity_tf_record.py -i data/just_traffic_light_image_proc/just_traffic_light_image_proc/just_traffic_light_image_proc_annotations.csv -o data/just_traffic_light_image_proc/just_traffic_light_image_proc/ -l traffic_light_label_map.pbtxt 
+
+
 ## Train
 
 ## Evaluate
