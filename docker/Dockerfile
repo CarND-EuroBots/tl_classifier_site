@@ -22,7 +22,7 @@ RUN pip install --upgrade pip && \
 WORKDIR /opt
 RUN git clone https://github.com/tensorflow/models.git && \
     cd models && \
-    git checkout 9a811d95c478b062393debd1559df61490b97149
+    git checkout edcd29f2dbb4b3eaed387fe17cb5270f867aec42
 
 # Compile protos
 WORKDIR /opt/models/research

@@ -16,13 +16,26 @@ or 'Red', respectively. Press 's' to skip image or 'q' for quitting.
 
 ## Create TFrecord
 
-    $ docker run --rm=true -it -v=$(pwd):$(pwd) -w=$(pwd) -u=$(id -u):$(id -g) carlosgalvezp/tf-object-detection /bin/bash
+    $ docker run --rm=true -it -v=$(pwd):$(pwd) -w=$(pwd) -u=$(id -u):$(id -g) carlosgalvezp/tf-object-detection:latest /bin/bash
 
     $ ./create_udacity_tf_record.py -i data/just_traffic_light_image_proc/just_traffic_light_image_proc/just_traffic_light_image_proc_annotations.csv -o data/just_traffic_light_image_proc/just_traffic_light_image_proc/ -l traffic_light_label_map.pbtxt 
 
 
 ## Train
 
+nvidia-docker run --rm=true -it -v=$(pwd):$(pwd) -w=$(pwd) -u=$(id -u):$(id -g) carlosgalvezp/tf-object-detection:latest /bin/bash
+
+python /opt/models/research/object_detection/train.py --logtostderr --pipeline_config_path=/home/cgalvezd/git/tl_classifier_site/ssd_mobilenet_v1_site.config --train_dir=/home/cgalvezd/git/tl_classifier_site/train_sandbox/models/ssd_mobilenet_v1_coco_2017_11_17/train
+
 ## Evaluate
 
+export CUDA_VISIBLE_DEVICES=
+
+python /opt/models/research/object_detection/eval.py --logtostderr --pipeline_config_path=/home/cgalvezd/git/tl_classifier_site/ssd_mobilenet_v1_site.config --checkpoint_dir=/home/cgalvezd/git/tl_classifier_site/train_sandbox/models/ssd_mobilenet_v1_coco_2017_11_17/train --eval_dir=/home/cgalvezd/git/tl_classifier_site/train_sandbox/models/ssd_mobilenet_v1_coco_2017_11_17/eval
+
+## Tensorboard
+tensorboard --logdir=/home/cgalvezd/git/tl_classifier_site/train_sandbox/models/ssd_mobilenet_v1_coco_2017_11_17/
+
 ## Freeze inference graph
+
+
