@@ -38,4 +38,4 @@ tensorboard --logdir=/home/cgalvezd/git/tl_classifier_site/train_sandbox/models/
 
 ## Freeze inference graph
 
-
+python /opt/models/research/object_detection/export_inference_graph.py --input_type image_tensor --pipeline_config_path ssd_mobilenet_v1_site.config --trained_checkpoint_prefix train_sandbox/models/ssd_mobilenet_v1_coco_2017_11_17/output_model/model.ckpt-83267 --output_directory train_sandbox/models/ssd_mobilenet_v1_coco_2017_11_17/output_model
