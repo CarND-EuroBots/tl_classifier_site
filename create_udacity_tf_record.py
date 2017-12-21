@@ -70,7 +70,7 @@ def create_tf_record(examples, output_path, label_map_dict):
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Create TF record')
 
-    parser.add_argument('-i', dest='annotations_paths', nargs='*')
+    parser.add_argument('-i', dest='annotations_paths', action='append')
     parser.add_argument('-o', dest='output_dir')
     parser.add_argument('-l', dest='label_map_path')
 
@@ -84,6 +84,7 @@ def main():
     annotations_files = args.annotations_paths
 
     for annotations_file in annotations_files:
+        print('Processing annotatations from {}...'.format(annotations_file))
         with open(annotations_file, 'r') as fid:
             for line in fid:
                 csv_data = line.split(', ')
