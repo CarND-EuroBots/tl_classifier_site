@@ -23,7 +23,7 @@ def help():
     return output
 
 def get_arguments():
-    parser = argparse.ArgumentParser('Annotate traffic lights from a rosbag')
+    parser = argparse.ArgumentParser(description='Annotate traffic lights from a rosbag')
     parser.add_argument('rosbag', help='input rosbag')
     parser.add_argument('output', help='output folder')
 
