@@ -66,6 +66,10 @@ def annotate_bag(input_bag_path, output_folder, append, msg_start):
     # Create output folder if it doesn't exist
     if not os.path.isdir(output_folder):
         os.makedirs(output_folder)
+    else:
+        if not append:
+            raise RuntimeError('The folder {} already exists! Use --apend or '
+                               'delete it first'.format(output_folder))
 
     # Open output filename
     write_type = 'a' if os.path.isfile(output_name) and append else 'w'
