@@ -71,7 +71,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Create TF record')
 
     parser.add_argument('-i', dest='annotations_paths', action='append')
-    parser.add_argument('-o', dest='output_dir')
+    parser.add_argument('-o', dest='output_path')
     parser.add_argument('-l', dest='label_map_path')
 
     return parser.parse_args()
@@ -97,24 +97,13 @@ def main():
 
                 examples.append(example)
 
-    # Shuffle
+    # Shuffle to avoid processing sequences
     random.seed(42)
     random.shuffle(examples)
 
-    # Split into training and validation sets
-    num_examples = len(examples)
-    num_train = int(0.7 * num_examples)
-
-    train_examples = examples[:num_train]
-    val_examples = examples[num_train:]
-
-    train_output_path = os.path.join(args.output_dir, 'train.record')
-    val_output_path = os.path.join(args.output_dir, 'val.record')
-
     # Create TF records
     label_map_dict = label_map_util.get_label_map_dict(args.label_map_path)
-    create_tf_record(train_examples, train_output_path, label_map_dict)
-    create_tf_record(val_examples, val_output_path, label_map_dict)
+    create_tf_record(examples, args.output_path, label_map_dict)
 
 if __name__ == '__main__':
     main()
